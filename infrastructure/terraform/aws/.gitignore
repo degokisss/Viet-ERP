@@ -1,0 +1,46 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+.terraform/
+.terraform.lock.hcl
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Local files
+local_*.tf
+
+# Backend configuration
+backend-*.hcl
+
+# Crash log files
+crash.log
+
+# Plan files
+*.tfplan
+plan.json
+tfplan
+
+# AWS credentials (should not be committed)
+.aws/
+credentials
+
+# Kubeconfig files
+kubeconfig
+kubeconfig_*
+
+# Generated documentation
+*.md.bak

@@ -657,6 +657,16 @@ export class SecurityError extends Error {
 }
 
 // ════════════════════════════════════════════════════════════
+// Security Headers (TIP-015)
+// ════════════════════════════════════════════════════════════
+
+export * from './headers';
+export * from './cors';
+export * from './middleware';
+export * from './csrf';
+export * from './sanitize';
+
+// ════════════════════════════════════════════════════════════
 // Exports
 // ════════════════════════════════════════════════════════════
 

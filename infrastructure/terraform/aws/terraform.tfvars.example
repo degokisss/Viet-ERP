@@ -1,0 +1,242 @@
+# ============================================================
+# VietERP Terraform Configuration - Example Values
+# Cấu hình Terraform cho VietERP - Giá trị ví dụ
+# ============================================================
+
+# Sao chép file này thành terraform.tfvars và điền các giá trị thực tế
+# Copy this file to terraform.tfvars and fill in actual values
+# cp terraform.tfvars.example terraform.tfvars
+
+# ============================================================
+# Development Environment
+# Môi trường phát triển
+# ============================================================
+
+# project_name = "vierp"
+# environment  = "dev"
+# aws_region   = "ap-southeast-1"
+
+# VPC Configuration
+# vpc_cidr                    = "10.0.0.0/16"
+# public_subnet_cidrs         = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+# private_subnet_cidrs        = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+# enable_nat_gateway_per_az   = false
+# enable_vpc_flow_logs        = true
+
+# EKS Configuration
+# kubernetes_version = "1.29"
+# cluster_log_retention_in_days = 7
+# enable_cluster_autoscaler = true
+
+# eks_node_groups = {
+#   general = {
+#     instance_types = ["t3.medium"]
+#     min_size       = 1
+#     max_size       = 5
+#     desired_size   = 2
+#     disk_size      = 50
+#     labels = {
+#       workload = "general"
+#     }
+#   }
+#   compute = {
+#     instance_types = ["t3.large"]
+#     min_size       = 0
+#     max_size       = 3
+#     desired_size   = 0
+#     disk_size      = 100
+#     labels = {
+#       workload = "compute"
+#     }
+#   }
+# }
+
+# RDS Configuration
+# rds_instance_class            = "db.t4g.medium"
+# rds_engine_version            = "16.1"
+# rds_allocated_storage         = 50
+# rds_max_allocated_storage     = 200
+# rds_backup_retention_days     = 7
+# rds_backup_window             = "03:00-04:00"
+# rds_maintenance_window        = "mon:04:00-mon:05:00"
+# rds_multi_az                  = false
+# rds_performance_insights_enabled = true
+# rds_database_name             = "vierp"
+# rds_username                  = "vierpadmin"
+# rds_password                  = ""  # Leave empty to auto-generate
+
+# Redis Configuration
+# redis_node_type                    = "cache.t4g.micro"
+# redis_engine_version               = "7.0"
+# redis_num_cache_clusters           = 1
+# redis_automatic_failover_enabled   = false
+# redis_multi_az_enabled             = false
+# redis_parameter_group_family       = "redis7"
+
+# S3 Configuration
+# s3_versioning_enabled              = true
+# s3_server_side_encryption_enabled  = true
+
+# Additional Tags
+# tags = {
+#   Team        = "Platform"
+#   CostCenter  = "Engineering"
+#   Owner       = "your-email@example.com"
+# }
+
+# ============================================================
+# Staging Environment
+# Môi trường staging
+# ============================================================
+
+# project_name = "vierp"
+# environment  = "staging"
+# aws_region   = "ap-southeast-1"
+
+# VPC Configuration
+# vpc_cidr                    = "10.1.0.0/16"
+# public_subnet_cidrs         = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
+# private_subnet_cidrs        = ["10.1.11.0/24", "10.1.12.0/24", "10.1.13.0/24"]
+# enable_nat_gateway_per_az   = false
+# enable_vpc_flow_logs        = true
+
+# EKS Configuration
+# kubernetes_version = "1.29"
+# cluster_log_retention_in_days = 7
+# enable_cluster_autoscaler = true
+
+# eks_node_groups = {
+#   general = {
+#     instance_types = ["t3.large"]
+#     min_size       = 2
+#     max_size       = 10
+#     desired_size   = 3
+#     disk_size      = 50
+#     labels = {
+#       workload = "general"
+#     }
+#   }
+#   compute = {
+#     instance_types = ["t3.xlarge"]
+#     min_size       = 1
+#     max_size       = 5
+#     desired_size   = 1
+#     disk_size      = 100
+#     labels = {
+#       workload = "compute"
+#     }
+#   }
+# }
+
+# RDS Configuration
+# rds_instance_class            = "db.t4g.large"
+# rds_engine_version            = "16.1"
+# rds_allocated_storage         = 100
+# rds_max_allocated_storage     = 500
+# rds_backup_retention_days     = 14
+# rds_backup_window             = "03:00-04:00"
+# rds_maintenance_window        = "mon:04:00-mon:05:00"
+# rds_multi_az                  = false
+# rds_performance_insights_enabled = true
+# rds_database_name             = "vierp"
+# rds_username                  = "vierpadmin"
+# rds_password                  = ""  # Leave empty to auto-generate
+
+# Redis Configuration
+# redis_node_type                    = "cache.t4g.small"
+# redis_engine_version               = "7.0"
+# redis_num_cache_clusters           = 2
+# redis_automatic_failover_enabled   = false
+# redis_multi_az_enabled             = false
+# redis_parameter_group_family       = "redis7"
+
+# S3 Configuration
+# s3_versioning_enabled              = true
+# s3_server_side_encryption_enabled  = true
+
+# ============================================================
+# Production Environment
+# Môi trường sản xuất
+# ============================================================
+
+# project_name = "vierp"
+# environment  = "prod"
+# aws_region   = "ap-southeast-1"
+
+# VPC Configuration
+# vpc_cidr                    = "10.2.0.0/16"
+# public_subnet_cidrs         = ["10.2.1.0/24", "10.2.2.0/24", "10.2.3.0/24"]
+# private_subnet_cidrs        = ["10.2.11.0/24", "10.2.12.0/24", "10.2.13.0/24"]
+# enable_nat_gateway_per_az   = true  # HA setup
+# enable_vpc_flow_logs        = true
+
+# EKS Configuration
+# kubernetes_version = "1.29"
+# cluster_log_retention_in_days = 30
+# enable_cluster_autoscaler = true
+
+# eks_node_groups = {
+#   general = {
+#     instance_types = ["t3.xlarge"]
+#     min_size       = 3
+#     max_size       = 20
+#     desired_size   = 5
+#     disk_size      = 50
+#     labels = {
+#       workload = "general"
+#     }
+#   }
+#   compute = {
+#     instance_types = ["c6i.2xlarge"]
+#     min_size       = 2
+#     max_size       = 10
+#     desired_size   = 3
+#     disk_size      = 100
+#     labels = {
+#       workload = "compute"
+#     }
+#     taints = [
+#       {
+#         key    = "workload"
+#         value  = "compute"
+#         effect = "NoSchedule"
+#       }
+#     ]
+#   }
+# }
+
+# RDS Configuration
+# rds_instance_class            = "db.r6i.xlarge"
+# rds_engine_version            = "16.1"
+# rds_allocated_storage         = 500
+# rds_max_allocated_storage     = 2000
+# rds_backup_retention_days     = 30
+# rds_backup_window             = "03:00-04:00"
+# rds_maintenance_window        = "mon:04:00-mon:05:00"
+# rds_multi_az                  = true  # High Availability
+# rds_performance_insights_enabled = true
+# rds_database_name             = "vierp"
+# rds_username                  = "vierpadmin"
+# rds_password                  = ""  # Use AWS Secrets Manager or pass via environment variable
+
+# Redis Configuration
+# redis_node_type                    = "cache.r6g.xlarge"
+# redis_engine_version               = "7.0"
+# redis_num_cache_clusters           = 3  # Auto-set to 3 for prod
+# redis_automatic_failover_enabled   = true
+# redis_multi_az_enabled             = true
+# redis_parameter_group_family       = "redis7"
+
+# S3 Configuration
+# s3_versioning_enabled              = true
+# s3_server_side_encryption_enabled  = true
+
+# Additional Tags
+# tags = {
+#   Team           = "Platform"
+#   CostCenter     = "Engineering"
+#   Owner          = "your-email@example.com"
+#   DataClassification = "Confidential"
+#   BackupPolicy   = "Daily"
+#   DisasterRecovery = "Required"
+# }

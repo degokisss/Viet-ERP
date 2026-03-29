@@ -1,0 +1,97 @@
+# ============================================================
+# Azure Terraform Configuration Example / Ví dụ Cấu hình Terraform Azure
+# ============================================================
+# Copy this file to terraform.tfvars and update values
+# Sao chép file này thành terraform.tfvars và cập nhật giá trị
+#
+# Usage / Cách sử dụng:
+# cp terraform.tfvars.example terraform.tfvars
+# terraform plan
+# ============================================================
+
+# ============================================================
+# Basic Configuration / Cấu hình Cơ bản
+# ============================================================
+
+project_name    = "vierp"
+subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  # Replace with your subscription ID / Thay thế bằng subscription ID của bạn
+environment     = "dev"                                    # dev, staging, or prod / dev, staging, hoặc prod
+location        = "Southeast Asia"
+location_short  = "sea"
+
+# ============================================================
+# Network Configuration / Cấu hình Mạng
+# ============================================================
+
+vnet_cidr              = "10.0.0.0/16"
+aks_subnet_cidr        = "10.0.1.0/24"
+database_subnet_cidr   = "10.0.2.0/24"
+redis_subnet_cidr      = "10.0.3.0/24"
+
+# ============================================================
+# AKS Configuration / Cấu hình AKS
+# ============================================================
+
+kubernetes_version = "1.29"
+
+# Node pools configuration / Cấu hình Node pools
+aks_node_pools = {
+  system = {
+    vm_size         = "Standard_D2s_v3"
+    min_count       = 1
+    max_count       = 3
+    os_disk_size_gb = 50
+    labels = {
+      workload = "system"
+    }
+    taints = []
+  }
+}
+
+enable_managed_identity            = true
+network_policy                     = "azure"  # "azure" or "calico" / "azure" hoặc "calico"
+enable_pod_security_policy         = true
+enable_http_application_routing    = false
+enable_azure_monitor               = true
+
+# ============================================================
+# PostgreSQL Configuration / Cấu hình PostgreSQL
+# ============================================================
+
+postgresql_sku_name                  = "B_Standard_B1ms"  # For dev/staging; for prod use GP_Standard_D4s_v3 / Cho dev/staging
+postgresql_version                   = "15"
+postgresql_storage_mb                = 32768  # 32GB, increase for production / Tăng cho production
+postgresql_backup_retention_days     = 7
+postgresql_high_availability_enabled = false  # Enable for production / Bật cho production
+
+postgresql_database_name         = "vierp"
+postgresql_administrator_login   = "vierpadmin"
+postgresql_administrator_password = ""  # Leave empty for auto-generate / Để trống để tự động tạo
+
+# ============================================================
+# Redis Configuration / Cấu hình Redis
+# ============================================================
+
+redis_sku                  = "Basic"  # Basic or Standard; use Premium for production HA / Sử dụng Premium cho production HA
+redis_capacity             = 0        # 0 for 250MB, 1 for 1GB, etc. / 0 cho 250MB, 1 cho 1GB, vv
+redis_enable_non_ssl_port  = false
+redis_minimum_tls_version  = "1.2"
+
+# ============================================================
+# Storage Configuration / Cấu hình Lưu trữ
+# ============================================================
+
+storage_account_tier             = "Standard"  # Standard or Premium / Standard hoặc Premium
+storage_account_replication_type = "LRS"       # LRS, GRS, RAGRS, ZRS / LRS, GRS, RAGRS, ZRS
+storage_uploads_retention_days   = 365
+storage_backups_retention_days   = 30
+
+# ============================================================
+# Additional Tags / Các Thẻ Bổ sung
+# ============================================================
+
+tags = {
+  team        = "infrastructure"
+  cost_center = "engineering"
+  owner       = "devops"
+}

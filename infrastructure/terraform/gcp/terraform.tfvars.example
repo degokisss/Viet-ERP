@@ -1,0 +1,127 @@
+# ============================================================
+# GCP Terraform Configuration Example / Ví dụ Cấu hình Terraform GCP
+# ============================================================
+# Copy this file to terraform.tfvars and update values
+# Sao chép file này thành terraform.tfvars và cập nhật giá trị
+#
+# Usage / Cách sử dụng:
+# cp terraform.tfvars.example terraform.tfvars
+# terraform plan
+# ============================================================
+
+# ============================================================
+# Basic Configuration / Cấu hình Cơ bản
+# ============================================================
+
+project_name = "vierp"
+project_id   = "vierp-project-id"  # Replace with your GCP project ID / Thay thế bằng GCP project ID của bạn
+environment  = "dev"                 # dev, staging, or prod / dev, staging, hoặc prod
+region       = "asia-southeast1"
+
+# ============================================================
+# VPC Configuration / Cấu hình VPC
+# ============================================================
+
+vpc_cidr                       = "10.0.0.0/16"
+primary_subnet_cidr            = "10.0.0.0/20"
+secondary_subnet_cidr          = "10.0.16.0/20"
+pods_secondary_range_cidr      = "10.1.0.0/16"
+services_secondary_range_cidr  = "10.2.0.0/16"
+enable_cloud_nat               = true
+
+# ============================================================
+# GKE Configuration / Cấu hình GKE
+# ============================================================
+
+gke_mode            = "standard"  # "autopilot" or "standard" / "autopilot" hoặc "standard"
+kubernetes_version  = "1.29"
+
+# Node pools for standard GKE / Node pools cho standard GKE
+gke_node_pools = {
+  default = {
+    machine_type = "n2-standard-2"
+    min_size     = 1
+    max_size     = 5
+    disk_size_gb = 50
+    labels = {
+      workload = "general"
+    }
+    taints = []
+  }
+}
+
+enable_workload_identity       = true
+enable_network_policy          = true
+enable_stackdriver_logging     = true
+enable_stackdriver_monitoring  = true
+
+# ============================================================
+# Cloud SQL Configuration / Cấu hình Cloud SQL
+# ============================================================
+
+cloudsql_database_version = "POSTGRES_16"
+cloudsql_tier             = "db-f1-micro"  # For dev, use db-f1-micro; for prod, use db-custom or larger
+cloudsql_allocated_storage_gb = 50
+
+cloudsql_backup_configuration = {
+  enabled                        = true
+  start_time                     = "03:00"
+  point_in_time_recovery_enabled = true
+  transaction_log_retention_days = 7
+}
+
+cloudsql_availability_type = "ZONAL"  # Use "REGIONAL" for production HA / Sử dụng "REGIONAL" cho production HA
+
+cloudsql_database_flags = {
+  max_connections = "100"
+  shared_buffers  = "25600"
+}
+
+cloudsql_database_name = "vierp"
+cloudsql_username      = "vierpadmin"
+cloudsql_password      = ""  # Leave empty for auto-generate / Để trống để tự động tạo
+
+# ============================================================
+# Memorystore Redis Configuration / Cấu hình Memorystore Redis
+# ============================================================
+
+memorystore_redis_version = "7.2"
+memorystore_tier          = "BASIC"   # BASIC or STANDARD; use STANDARD for production / BASIC hoặc STANDARD
+memorystore_size_gb       = 5         # Increase for production / Tăng cho production
+memorystore_enable_auth   = true
+
+# ============================================================
+# Cloud Storage Configuration / Cấu hình Cloud Storage
+# ============================================================
+
+gcs_versioning_enabled = true
+gcs_storage_class      = "STANDARD"  # STANDARD, NEARLINE, COLDLINE, or ARCHIVE
+
+gcs_uploads_lifecycle_rules = [
+  {
+    action   = "Delete"
+    age_days = 365
+  }
+]
+
+gcs_backups_lifecycle_rules = [
+  {
+    action          = "SetStorageClass"
+    age_days        = 30
+    storage_class   = "NEARLINE"
+  },
+  {
+    action   = "Delete"
+    age_days = 365
+  }
+]
+
+# ============================================================
+# Additional Labels / Các Nhãn Bổ sung
+# ============================================================
+
+labels = {
+  team        = "infrastructure"
+  cost_center = "engineering"
+  owner       = "devops"
+}

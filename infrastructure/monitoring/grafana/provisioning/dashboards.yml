@@ -1,5 +1,5 @@
 # ============================================================
-# Grafana Dashboard Provisioning (TIP-005)
+# Grafana Dashboard Provisioning (TIP-005, TIP-018)
 # Auto-load dashboards from /var/lib/grafana/dashboards/
 # ============================================================
 
@@ -15,3 +15,10 @@ providers:
     allowUiUpdates: true
     options:
       path: /var/lib/grafana/dashboards
+
+# Dashboard specifications:
+# 1. overview.json        - System Overview (TIP-005)
+# 2. per-app.json         - Per-Application Detail (TIP-018)
+# 3. database.json        - PostgreSQL Database Monitoring (TIP-018)
+# 4. nats.json            - NATS JetStream Monitoring (TIP-018)
+# 5. business.json        - Business KPIs & SLO Tracking (TIP-018)
