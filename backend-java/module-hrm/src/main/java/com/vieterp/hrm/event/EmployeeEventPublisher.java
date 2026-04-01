@@ -21,21 +21,24 @@ public class EmployeeEventPublisher {
         var event = new EmployeeCreatedEvent(
             employee.getId(), employee.getEmail(),
             employee.getFirstName(), employee.getLastName(), Instant.now());
-        streamBridge.send("employee-created-out-0", event);
-        log.info("Published EmployeeCreatedEvent for {}", employee.getId());
+        boolean sent = streamBridge.send("employee-created-out-0", event);
+        if (!sent) log.warn("Event not sent for employee {} — no binder bound", employee.getId());
+        else log.info("Published EmployeeCreatedEvent for {}", employee.getId());
     }
 
     public void publishUpdated(Employee employee) {
         var event = new EmployeeUpdatedEvent(
             employee.getId(), employee.getFirstName(),
             employee.getLastName(), employee.getEmail(), Instant.now());
-        streamBridge.send("employee-updated-out-0", event);
-        log.info("Published EmployeeUpdatedEvent for {}", employee.getId());
+        boolean sent = streamBridge.send("employee-updated-out-0", event);
+        if (!sent) log.warn("Event not sent for employee {} — no binder bound", employee.getId());
+        else log.info("Published EmployeeUpdatedEvent for {}", employee.getId());
     }
 
     public void publishDeleted(java.util.UUID employeeId) {
         var event = new EmployeeDeletedEvent(employeeId, Instant.now());
-        streamBridge.send("employee-deleted-out-0", event);
-        log.info("Published EmployeeDeletedEvent for {}", employeeId);
+        boolean sent = streamBridge.send("employee-deleted-out-0", event);
+        if (!sent) log.warn("Event not sent for employee {} — no binder bound", employeeId);
+        else log.info("Published EmployeeDeletedEvent for {}", employeeId);
     }
 }

@@ -8,6 +8,8 @@ import java.util.UUID;
  */
 class EmployeeEventPublisherTestDouble extends com.vieterp.hrm.event.EmployeeEventPublisher {
 
+    private boolean publishUpdatedCalled = false;
+
     public EmployeeEventPublisherTestDouble() {
         super(null);
     }
@@ -19,11 +21,19 @@ class EmployeeEventPublisherTestDouble extends com.vieterp.hrm.event.EmployeeEve
 
     @Override
     public void publishUpdated(Employee employee) {
-        // no-op in tests
+        publishUpdatedCalled = true;
     }
 
     @Override
     public void publishDeleted(UUID employeeId) {
         // no-op in tests
+    }
+
+    public boolean wasPublishUpdatedCalled() {
+        return publishUpdatedCalled;
+    }
+
+    public void reset() {
+        publishUpdatedCalled = false;
     }
 }

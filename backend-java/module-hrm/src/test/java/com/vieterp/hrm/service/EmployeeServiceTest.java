@@ -78,4 +78,18 @@ class EmployeeServiceTest {
         employeeService.delete(testId);
         verify(employeeRepository).deleteById(testId);
     }
+
+    @Test
+    void update_updatesEmployeeAndPublishesEvent() {
+        CreateEmployeeRequest req = new CreateEmployeeRequest(
+            "Updated", "Name", "updated@example.com", "0999999999", null, "INACTIVE");
+        when(employeeRepository.findByIdWithDepartment(testId)).thenReturn(Optional.of(testEmployee));
+        when(employeeRepository.save(any(Employee.class))).thenReturn(testEmployee);
+
+        EmployeeResponse resp = employeeService.update(testId, req);
+
+        assertNotNull(resp);
+        verify(employeeRepository).save(any(Employee.class));
+        assertTrue(eventPublisher.wasPublishUpdatedCalled());
+    }
 }

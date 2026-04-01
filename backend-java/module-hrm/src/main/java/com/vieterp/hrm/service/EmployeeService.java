@@ -61,6 +61,25 @@ public class EmployeeService {
     }
 
     @Transactional
+    public EmployeeResponse update(UUID id, CreateEmployeeRequest req) {
+        Employee emp = employeeRepository.findByIdWithDepartment(id)
+            .orElseThrow(() -> new EmployeeNotFoundException(id));
+        emp.setFirstName(req.firstName());
+        emp.setLastName(req.lastName());
+        emp.setEmail(req.email());
+        emp.setPhone(req.phone());
+        if (req.status() != null) emp.setStatus(req.status());
+        if (req.departmentId() != null) {
+            Department dept = departmentRepository.findById(req.departmentId())
+                .orElseThrow(() -> new IllegalArgumentException("Department not found: " + req.departmentId()));
+            emp.setDepartment(dept);
+        }
+        Employee saved = employeeRepository.save(emp);
+        eventPublisher.publishUpdated(saved);
+        return toResponse(saved);
+    }
+
+    @Transactional
     public void delete(UUID id) {
         if (!employeeRepository.existsById(id)) {
             throw new EmployeeNotFoundException(id);

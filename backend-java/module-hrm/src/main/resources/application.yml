@@ -27,21 +27,6 @@ spring:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/vieterp}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/vieterp/protocol/openid-connect/certs}
 
-  cloud:
-    stream:
-      binders:
-        nats:
-          type: nats
-          environment:
-            spring.cloud.stream.nats.binder.url: ${NATS_URL:nats://localhost:4222}
-      bindings:
-        employee-created-out-0:
-          destination: hrm.employee.created
-        employee-updated-out-0:
-          destination: hrm.employee.updated
-        employee-deleted-out-0:
-          destination: hrm.employee.deleted
-
   cache:
     type: redis
   data:

@@ -41,6 +41,12 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.listAll());
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Update employee")
+    public ResponseEntity<EmployeeResponse> update(@PathVariable UUID id, @Valid @RequestBody CreateEmployeeRequest req) {
+        return ResponseEntity.ok(employeeService.update(id, req));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete employee")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
