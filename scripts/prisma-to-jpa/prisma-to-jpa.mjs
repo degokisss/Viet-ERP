@@ -76,7 +76,7 @@ function parseSchema(content) {
   }
 
   // Match model blocks: model ModelName { ... }
-  const modelRegex = /^model\s+(\w+)\s*\{([\s\S]*?)\n\}/gm;
+  const modelRegex = /^model\s+(\w+)\s*\{([\s\S]*?)\n?\}/gm;
 
   let match;
   while ((match = modelRegex.exec(schemaContent)) !== null) {
@@ -163,7 +163,7 @@ function parseFields(body, modelNames) {
       if (paramsMatch) {
         const paramStr = paramsMatch[1];
         // Parse key=value pairs
-        const kvMatches = paramStr.matchAll(/(\w+)\s*=\s*("[^"]*"|\w+)/g);
+        const kvMatches = paramStr.matchAll(/(\w+)\s*=\s*("(?:[^"]*)"|'([^']*)'|\w+)/g);
         for (const [, k, v] of kvMatches) {
           params[k] = v.replace(/"/g, '');
         }
@@ -306,7 +306,7 @@ function generateEntity(model, packageName) {
     if (field.isUnique) {
       colProps.push('unique = true');
     }
-    if (field.javaType === 'String' && !field.isId) {
+    if (field.javaType === 'String') {
       colProps.push('length = 191');
     }
     if (field.isOptional) {
@@ -329,7 +329,7 @@ function generateEntity(model, packageName) {
       .filter(Boolean)
       .join('\n    ');
 
-    const visibility = field.isId ? 'private ' : 'private ';
+    const visibility = 'private ';
     fieldLines.push(`    ${finalAnnotations ? finalAnnotations + '\n    ' : ''}${visibility}${javaType} ${field.name};`);
   }
 
