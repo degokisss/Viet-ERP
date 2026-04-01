@@ -1,0 +1,23 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Environment
+.env
+.env.*
+
+# Editor swap files
+*.swp
+*.swo
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
