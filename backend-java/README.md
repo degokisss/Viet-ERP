@@ -11,7 +11,7 @@ Spring Boot 4.x backend for Viet ERP.
 ## Run HRM Module
 
 ```bash
-java -jar module-hrm/target/module-hrm.jar
+./mvnw -pl module-hrm spring-boot:run
 ```
 
 ## Modules
