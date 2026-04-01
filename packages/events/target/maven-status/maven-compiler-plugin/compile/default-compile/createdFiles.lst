@@ -1,0 +1,3 @@
+com/vieterp/events/employee/EmployeeUpdatedEvent.class
+com/vieterp/events/employee/EmployeeCreatedEvent.class
+com/vieterp/events/employee/EmployeeDeletedEvent.class
