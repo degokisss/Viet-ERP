@@ -17,6 +17,7 @@
         <module>module-crm</module>
         <module>module-accounting</module>
         <module>module-mrp</module>
+        <module>module-tpm</module>
         <module>module-events</module>
         <module>module-auth</module>
         <module>module-api-types</module>

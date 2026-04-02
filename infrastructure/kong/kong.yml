@@ -2,28 +2,28 @@ _format_version: "3.0"
 
 services:
   - name: mrp-service
-    url: http://host.docker.internal:3001
+    url: http://host.docker.internal:8083
     routes:
       - name: mrp-route
         paths: ["/api/mrp"]
         strip_path: true
 
   - name: hrm-service
-    url: http://host.docker.internal:3002
+    url: http://host.docker.internal:8080
     routes:
       - name: hrm-route
         paths: ["/api/hrm"]
         strip_path: true
 
   - name: crm-service
-    url: http://host.docker.internal:3003
+    url: http://host.docker.internal:8081
     routes:
       - name: crm-route
         paths: ["/api/crm"]
         strip_path: true
 
   - name: tpm-service
-    url: http://host.docker.internal:3004
+    url: http://host.docker.internal:8084
     routes:
       - name: tpm-route
         paths: ["/api/tpm"]
@@ -44,7 +44,7 @@ services:
         strip_path: true
 
   - name: acc-service
-    url: http://host.docker.internal:3007
+    url: http://host.docker.internal:8082
     routes:
       - name: acc-route
         paths: ["/api/acc"]
