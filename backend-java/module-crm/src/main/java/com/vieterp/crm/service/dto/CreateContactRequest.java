@@ -3,7 +3,9 @@ package com.vieterp.crm.service.dto;
 import com.vieterp.crm.domain.Contact;
 import jakarta.validation.constraints.*;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record CreateContactRequest(
     @NotBlank(message = "First name is required") @Size(max = 100) String firstName,
     @NotBlank(message = "Last name is required") @Size(max = 100) String lastName,

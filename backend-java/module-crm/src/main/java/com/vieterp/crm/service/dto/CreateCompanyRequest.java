@@ -2,7 +2,9 @@ package com.vieterp.crm.service.dto;
 
 import com.vieterp.crm.domain.Company;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
+@Builder
 public record CreateCompanyRequest(
     @NotBlank(message = "Name is required") @Size(max = 255) String name,
     @Size(max = 255) String domain,

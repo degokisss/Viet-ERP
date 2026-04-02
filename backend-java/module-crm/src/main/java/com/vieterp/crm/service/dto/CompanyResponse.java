@@ -3,7 +3,9 @@ package com.vieterp.crm.service.dto;
 import com.vieterp.crm.domain.Company;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record CompanyResponse(
     UUID id,
     String name,

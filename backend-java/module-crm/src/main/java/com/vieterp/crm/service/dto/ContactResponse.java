@@ -4,7 +4,9 @@ import com.vieterp.crm.domain.Company;
 import com.vieterp.crm.domain.Contact;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record ContactResponse(
     UUID id,
     String firstName,
