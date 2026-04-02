@@ -25,21 +25,35 @@ function interpolate(str: any, params?: Record<string, any>): string {
 }
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const [language, setLanguageState] = useState('vi');
+  // Load persisted language via lazy initializer to avoid cascading renders
+  const [language, setLanguageState] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('app-language');
+        if (saved && translations[saved]) {
+          document.documentElement.lang = saved;
+          return saved;
+        }
+        document.documentElement.lang = 'vi';
+      } catch {
+        // localStorage may throw SecurityError in private browsing mode
+      }
+    }
+    return 'vi';
+  });
 
-  // Load persisted language on mount
+  // Load persisted language on mount (only for hydration)
   useEffect(() => {
     try {
       const saved = localStorage.getItem('app-language');
-      if (saved && translations[saved]) {
-        setLanguageState(saved);
-        document.documentElement.lang = saved;
-      } else {
-        document.documentElement.lang = 'vi';
+      if (saved && translations[saved] && saved !== language) {
+        requestAnimationFrame(() => {
+          setLanguageState(saved);
+          document.documentElement.lang = saved;
+        });
       }
     } catch {
       // localStorage may throw SecurityError in private browsing mode
-      document.documentElement.lang = 'vi';
     }
   }, []);
 

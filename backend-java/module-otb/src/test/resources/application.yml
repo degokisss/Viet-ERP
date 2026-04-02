@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: module-otb-test
+
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vieterp_test
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/vieterp}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/vieterp/protocol/openid-connect/certs}
+
+  cache:
+    type: none
+
+server:
+  port: 0
+
+app:
+  jwt:
+    secret: test-secret-key-for-jwt-signing-minimum-256-bits-required-for-hs256-tests
+    access-token-expiry-ms: 900000
+    refresh-token-expiry-ms: 604800000
+    issuer: http://localhost:0/api/v1
