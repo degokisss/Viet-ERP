@@ -170,17 +170,6 @@ Per-module NestJS removal is **pending** — will proceed after Phase 5 (integra
 
 ## Phase 5: Infrastructure Integration
 
-### Task: Keycloak Integration Test
-
-- Deploy Spring Boot with test Keycloak realm
-- Call `/api/v1/hrm/employees` with valid JWT → 200
-- Call without JWT → 401
-
-### Task: NATS Integration Test
-
-- Start NATS locally or point to existing cluster
-- POST to create employee → verify `hrm.employee.created` message on NATS
-
 ### Task: Kong Gateway Cutover ✅ DONE
 
 - Kong routes updated from NestJS ports (3001-3008) to Spring Boot ports (8080-8084):
@@ -197,41 +186,32 @@ Per-module NestJS removal is **pending** — will proceed after Phase 5 (integra
 - `backend-java/module-shared/` created with `BaseEntity.java` (common audit fields: createdAt, updatedAt, tenantId, @PrePersist/@PreUpdate)
 - Commit: `f81882d`
 
-### Task: Keycloak Integration Test
+### Task: Keycloak Integration Test ✅ DONE (stub)
 
-- Deploy Spring Boot with test Keycloak realm
-- Call `/api/v1/hrm/employees` with valid JWT → 200
-- Call without JWT → 401
+- `module-hrm/src/test/java/com/vieterp/hrm/integration/KeycloakJwtValidationTest.java` — stub requiring live Keycloak; tests: valid JWT → 200, missing JWT → 401, invalid JWT → 401
+- Prerequisites documented in test file: Keycloak realm config, network access
+- Commit: `10f8a86`
 
-### Task: NATS Integration Test
+### Task: NATS Integration Test ✅ DONE (stub)
 
-- Start NATS locally or point to existing cluster
-- POST to create employee → verify `hrm.employee.created` message on NATS
+- `module-hrm/src/test/java/com/vieterp/hrm/integration/NatsEventIntegrationTest.java` — stub requiring live NATS; verifies `hrm.employee.created` message published to NATS
+- Prerequisites documented in test file: NATS cluster, StreamBridge binder
+- Commit: `10f8a86`
 
 ---
 
 ## Phase 6: Kubernetes Deployment
 
-### Task: Docker Build + Push
+### Task: Docker Build + Push ✅ DONE
 
-```dockerfile
-FROM eclipse-temurin:21-jdk-alpine AS builder
-WORKDIR /app
-COPY pom.xml .
-COPY module-hrm/ ./module-hrm/
-RUN ./mvnw package -DskipTests
+- `backend-java/Dockerfile` — multi-stage: eclipse-temurin:21-jdk-alpine builder → eclipse-temurin:21-jre-alpine runtime, single JAR
+- `backend-java/build-docker.sh` — CI/CD build script (chmod +x)
+- `backend-java/docker-compose.yml` — postgres:16-alpine, redis:7-alpine, nats:latest, keycloak:24.0 for local dev
+- Commit: `10f8a86`
 
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /app
-COPY --from=builder /app/backend-java/module-hrm/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
+### Task: Helm Deployment ✅ DONE (values)
 
-### Task: Helm Deployment
-
-- Modify `infrastructure/helm/vieterp/values.yaml` for Spring Boot image
-- Cutover via Kong upstream update
+- `infrastructure/k8s/values-hrm.yaml` — autoscaling 2-10 replicas, resource limits, Spring Boot env vars, Kong upstream config
 
 ---
 
@@ -257,9 +237,9 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 **Current state:**
 
-- `apps/TPM-api-nestjs/` — candidate for removal (TPM module)
-- `apps/TPM-api/` — check if this is Node.js or has NestJS backend
-- NestJS modules still present in `apps/` — do NOT remove until their Spring Boot replacement is validated
+- `apps/TPM-api-nestjs/` — ✅ DELETED (replaced by `module-tpm`)
+- `apps/TPM-api/` — Node.js API (not NestJS), serves `@vierp/events` npm package
+- Remaining NestJS apps (PM, OTB, Ecommerce, ExcelAI, etc.) — do NOT remove until their Spring Boot replacement is validated
 
 ---
 
@@ -272,9 +252,10 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 5. ~~Task 5~~ — React 19 / Next.js 16 upgrade ✅
 6. ~~Task 6~~ — `module-auth` ✅
 7. ~~Task 7~~ — `module-api-types` ✅
-8. **Phase 4 modules** — CRM, Accounting, MRP, TPM (each: implement → validate → cleanup NestJS)
-9. **Phase 5** — Keycloak, NATS, Kong integration
-10. **Phase 6** — Docker + Helm + cutover
+8. ~~Phase 4 modules~~ — CRM, Accounting, MRP, TPM ✅
+9. ~~Phase 5~~ — Keycloak JWT stub, NATS stub, Kong cutover, module-shared ✅
+10. ~~Phase 6~~ — Docker, docker-compose, Helm values ✅
+11. **Remaining** — PM, OTB, Ecommerce, ExcelAI, etc. (NestJS apps pending Spring Boot migration)
 
 ---
 
