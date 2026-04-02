@@ -15,7 +15,9 @@ export default function MobileFilterSheet({
   const [localValues, setLocalValues] = useState<any>(values);
 
   useEffect(() => {
-    if (isOpen) setLocalValues(values);
+    if (isOpen) {
+      requestAnimationFrame(() => setLocalValues(values));
+    }
   }, [isOpen, values]);
 
   const handleChange = (key: any, value: any) => {

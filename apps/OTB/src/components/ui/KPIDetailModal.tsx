@@ -73,9 +73,11 @@ const KPIDetailModal = ({
     return () => document.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
-  // Portal mount point
+  // Portal mount point - use ref to avoid cascading renders
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
 
   if (!isOpen || !mounted) return null;
 

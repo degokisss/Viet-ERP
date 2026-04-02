@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DollarSign, Package, BarChart3, TrendingUp,
@@ -13,15 +13,77 @@ import {
 import { ROUTE_MAP } from '@/utils/routeMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+// Collapsed sidebar item with tooltip - defined outside to avoid creating components during render
+const CollapsedMenuItem = ({ item, showDividerAfter = false, currentScreen, navigateTo, hoveredItem, setHoveredItem, t }: any) => {
+  const isActive = currentScreen === item.id;
+  const Icon = item.icon;
+
+  return (
+    <>
+      <div className="relative">
+        <button
+          onClick={() => navigateTo(item.id)}
+          onMouseEnter={() => setHoveredItem(item.id)}
+          onMouseLeave={() => setHoveredItem(null)}
+          className={`group relative w-full flex items-center justify-center h-8 rounded-lg transition-all duration-200
+            ${isActive
+              ? ''
+              : 'hover:bg-[rgba(215,183,151,0.06)]'
+            }`}
+          style={isActive ? {
+            background: 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)',
+          } : undefined}
+        >
+          {/* Active indicator */}
+          {isActive && (
+            <div
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-r-full"
+              style={{ background: 'linear-gradient(180deg, #D7B797 0%, #C49A6C 100%)' }}
+            />
+          )}
+
+          <Icon
+            size={16}
+            strokeWidth={isActive ? 2.5 : 2}
+            className={`transition-all duration-200 ${
+              isActive
+                ? 'text-[#6B4D30]'
+                : 'text-gray-600 group-hover:text-[#6B4D30]'
+            }`}
+            style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+          />
+        </button>
+
+        {/* Tooltip */}
+        {hoveredItem === item.id && (
+          <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none">
+            <div className="px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap text-[11px] font-medium font-['Montserrat'] bg-white text-gray-800 border border-gray-300">
+              {item.label}
+            </div>
+            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-white" />
+          </div>
+        )}
+      </div>
+      {showDividerAfter && (
+        <div className="my-1.5 mx-2">
+          <div className="h-px" style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
+          }} />
+        </div>
+      )}
+    </>
+  );
+};
+
 const Sidebar = ({ currentScreen, user, onLogout }: any) => {
   const router = useRouter();
   const { t } = useLanguage();
-  const navigateTo = (screenId: any) => {
+  const navigateTo = useCallback((screenId: any) => {
     const route = ROUTE_MAP[screenId];
     if (route) {
       router.push(route);
     }
-  };
+  }, [router]);
   const [isMasterDataOpen, setIsMasterDataOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [openGroups, setOpenGroups] = useState<any>({ planning: true, approval: true, confirmation: false });
@@ -82,68 +144,6 @@ const Sidebar = ({ currentScreen, user, onLogout }: any) => {
     return 'text-gray-600 font-medium group-hover:text-[#6B4D30]';
   };
 
-  // Collapsed sidebar item with tooltip
-  const CollapsedMenuItem = ({ item, showDividerAfter = false }: any) => {
-    const isActive = currentScreen === item.id;
-    const Icon = item.icon;
-
-    return (
-      <>
-        <div className="relative">
-          <button
-            onClick={() => navigateTo(item.id)}
-            onMouseEnter={() => setHoveredItem(item.id)}
-            onMouseLeave={() => setHoveredItem(null)}
-            className={`group relative w-full flex items-center justify-center h-8 rounded-lg transition-all duration-200
-              ${isActive
-                ? ''
-                : 'hover:bg-[rgba(215,183,151,0.06)]'
-              }`}
-            style={isActive ? {
-              background: 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)',
-            } : undefined}
-          >
-            {/* Active indicator */}
-            {isActive && (
-              <div
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-r-full"
-                style={{ background: 'linear-gradient(180deg, #D7B797 0%, #C49A6C 100%)' }}
-              />
-            )}
-
-            <Icon
-              size={16}
-              strokeWidth={isActive ? 2.5 : 2}
-              className={`transition-all duration-200 ${
-                isActive
-                  ? 'text-[#6B4D30]'
-                  : 'text-gray-600 group-hover:text-[#6B4D30]'
-              }`}
-              style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
-            />
-          </button>
-
-          {/* Tooltip */}
-          {hoveredItem === item.id && (
-            <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none">
-              <div className="px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap text-[11px] font-medium font-['Montserrat'] bg-white text-gray-800 border border-gray-300">
-                {item.label}
-              </div>
-              <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-white" />
-            </div>
-          )}
-        </div>
-        {showDividerAfter && (
-          <div className="my-1.5 mx-2">
-            <div className="h-px" style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
-            }} />
-          </div>
-        )}
-      </>
-    );
-  };
-
   return (
     <div
       className={`${isCollapsed ? 'w-[56px]' : 'w-[264px]'} h-screen border-r flex flex-col sticky top-0 z-40 transition-[width] duration-200 ease-out`}
@@ -193,7 +193,7 @@ const Sidebar = ({ currentScreen, user, onLogout }: any) => {
         {isCollapsed ? (
           /* Collapsed View */
           <div className="px-1.5 space-y-0.5">
-            <CollapsedMenuItem item={{ id: 'home', label: t('nav.homeDashboard'), icon: Home }} showDividerAfter />
+            <CollapsedMenuItem item={{ id: 'home', label: t('nav.homeDashboard'), icon: Home }} showDividerAfter currentScreen={currentScreen} navigateTo={navigateTo} hoveredItem={hoveredItem} setHoveredItem={setHoveredItem} t={t} />
             {menuGroups.map((group: any, groupIndex: any) => (
               <div key={group.id}>
                 {group.items.map((item: any, itemIndex: any) => (
@@ -201,6 +201,11 @@ const Sidebar = ({ currentScreen, user, onLogout }: any) => {
                     key={item.id}
                     item={item}
                     showDividerAfter={groupIndex < menuGroups.length - 1 && itemIndex === group.items.length - 1}
+                    currentScreen={currentScreen}
+                    navigateTo={navigateTo}
+                    hoveredItem={hoveredItem}
+                    setHoveredItem={setHoveredItem}
+                    t={t}
                   />
                 ))}
               </div>
@@ -210,8 +215,8 @@ const Sidebar = ({ currentScreen, user, onLogout }: any) => {
                 background: 'linear-gradient(90deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
               }} />
             </div>
-            <CollapsedMenuItem item={{ id: 'master-brands', label: t('nav.masterData'), icon: Database }} />
-            <CollapsedMenuItem item={{ id: 'import-data', label: t('nav.importData') || 'Import Data', icon: Upload }} />
+            <CollapsedMenuItem item={{ id: 'master-brands', label: t('nav.masterData'), icon: Database }} currentScreen={currentScreen} navigateTo={navigateTo} hoveredItem={hoveredItem} setHoveredItem={setHoveredItem} t={t} />
+            <CollapsedMenuItem item={{ id: 'import-data', label: t('nav.importData') || 'Import Data', icon: Upload }} currentScreen={currentScreen} navigateTo={navigateTo} hoveredItem={hoveredItem} setHoveredItem={setHoveredItem} t={t} />
           </div>
         ) : (
           /* Expanded View */

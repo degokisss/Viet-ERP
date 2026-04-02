@@ -65,6 +65,8 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
   );
 });
 
+EditableCell.displayName = 'EditableCell';
+
 // Approval Status Badge Component
 const ApprovalStatusBadge = ({ status }: any) => {
   const statusConfig: Record<string, any> = {

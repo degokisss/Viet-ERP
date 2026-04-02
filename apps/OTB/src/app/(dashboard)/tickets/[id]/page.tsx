@@ -1,25 +1,26 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TicketDetailPage } from '@/features/tickets';
 
 export default function TicketDetailRoute() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [ticket, setTicket] = useState<any>(null);
   const showApprovalActions = searchParams.get('source') === 'approvals';
 
-  useEffect(() => {
-    const stored = sessionStorage.getItem('selectedTicket');
-    if (stored) {
-      setTicket(JSON.parse(stored));
+  // Initialize state via lazy initializer to avoid cascading renders
+  const [ticket, setTicket] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('selectedTicket');
+      return stored ? JSON.parse(stored) : null;
     }
-  }, []);
+    return null;
+  });
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     sessionStorage.removeItem('selectedTicket');
     router.push(showApprovalActions ? '/approvals' : '/tickets');
-  };
+  }, [router, showApprovalActions]);
 
   return (
     <TicketDetailPage

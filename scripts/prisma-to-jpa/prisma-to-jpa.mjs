@@ -106,20 +106,22 @@ function parseFields(body, modelNames) {
     if (trimmed.startsWith('@@')) continue;
 
     // Skip relation fields (types that reference other models, not scalars or enums)
-    // These are relations like "tenant Tenant @relation(...)" or "employees Employee[]"
-    const relationMatch = trimmed.match(/^(\w+)\s+(\w+[\[\]?]?)\s+@relation/);
+    // These are relations like "tenant Tenant @relation(...)" or "employees Employee[] @relation(...)"
+    // Type can be "Model" or "Model[]" or "Model?" or "Model?[]"
+    const relationMatch = trimmed.match(/^([\w]+)\s+(\w+[\[\]?\s]*?)\s+@relation/);
     if (relationMatch) continue;
-    const arrayRelationMatch = trimmed.match(/^(\w+)\s+(\w+[\[\]?]?)\s*$/);
-    if (arrayRelationMatch && modelNames.has(arrayRelationMatch[2].replace(/\[\]$/, '').replace(/\?$/, ''))) {
-      // Check if this is actually a relation field (type is a model name)
-      const possibleType = arrayRelationMatch[2].replace(/\[\]$/, '').replace(/\?$/, '');
-      if (modelNames.has(possibleType) && !TYPE_MAP[possibleType] && !possibleType.startsWith('Enum')) {
+    // Also skip array/optional relation fields without @relation (back relation fields)
+    const arrayRelationMatch = trimmed.match(/^([\w]+)\s+(\w+[\[\]?\s]*?)\s*$/);
+    if (arrayRelationMatch) {
+      const possibleType = arrayRelationMatch[2].replace(/[\[\]?\s]/g, '');
+      if (modelNames.has(possibleType) && !TYPE_MAP[possibleType]) {
         continue;
       }
     }
 
     // Parse field: fieldName Type? @decorators
-    const fieldMatch = trimmed.match(/^(\w+)\s+(\w+[\[\]?]?)\s*(.*)?$/);
+    // Note: [\w]+ allows underscores in field names (e.g., allocate_headers, fiscal_year)
+    const fieldMatch = trimmed.match(/^([\w]+)\s+(\w+[\[\]?\s]*?)\s*(.*)?$/);
     if (!fieldMatch) continue;
 
     const fieldName = fieldMatch[1];
@@ -133,8 +135,8 @@ function parseFields(body, modelNames) {
     }
 
     const field = {
-      name: fieldName,
-      columnName: toSnakeCase(fieldName),
+      name: toCamelCase(fieldName),   // Java field name in camelCase
+      columnName: toSnakeCase(fieldName), // DB column name in snake_case
       prismaType: fieldType,
       javaType: mapType(fieldType),
       isEnum: mapType(fieldType) === null,
@@ -231,10 +233,13 @@ function toSnakeCase(name) {
 }
 
 /**
- * Converts PascalCase to camelCase (for JavaBean property names)
+ * Converts snake_case or PascalCase to camelCase (for JavaBean property names)
+ * e.g., "fiscal_year" -> "fiscalYear", "FiscalYear" -> "fiscalYear"
  */
 function toCamelCase(name) {
-  return name.charAt(0).toLowerCase() + name.slice(1);
+  return name
+    .replace(/_([a-z])/g, (_, c) => c.toUpperCase()) // snake_case -> camelCase
+    .replace(/^([A-Z])/, (_, c) => c.toLowerCase()); // PascalCase -> camelCase
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -329,8 +334,10 @@ function generateEntity(model, packageName) {
       .filter(Boolean)
       .join('\n    ');
 
+    // Use simple class name for field type (java.math.BigDecimal -> BigDecimal, etc.)
+    const simpleType = javaType.includes('.') ? javaType.split('.').pop() : javaType;
     const visibility = 'private ';
-    fieldLines.push(`    ${finalAnnotations ? finalAnnotations + '\n    ' : ''}${visibility}${javaType} ${field.name};`);
+    fieldLines.push(`    ${finalAnnotations ? finalAnnotations + '\n    ' : ''}${visibility}${simpleType} ${field.name};`);
   }
 
   // Add timestamp fields at the end

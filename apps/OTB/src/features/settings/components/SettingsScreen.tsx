@@ -10,6 +10,64 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { ConfirmDialog } from '@/components/ui';
 
+// Sub-components defined outside to avoid creating components during render
+const SettingSection = ({ title, description, children, borderColor = 'border-gray-300', headerBg, boxShadow }: any) => (
+  <div className={`rounded-xl border overflow-hidden ${borderColor}`} style={{
+    background: 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
+    boxShadow: boxShadow || `inset 0 -1px 0 rgba(215,183,151,0.04)` }}>
+    <div className={`px-5 py-4 border-b border-gray-200`}>
+      <h3 className="text-base font-semibold font-['Montserrat'] text-gray-900">
+        {title}
+      </h3>
+      {description && (
+        <p className="text-xs mt-0.5 text-gray-700">
+          {description}
+        </p>
+      )}
+    </div>
+    <div className="p-2">
+      {children}
+    </div>
+  </div>
+);
+
+const SettingRow = ({ icon: Icon, label, description, children, onClick, borderColor = 'border-gray-300', bgIcon = 'bg-gray-100', iconColor = 'text-[#6B4D30]', textColor = 'text-gray-900', descColor = 'text-gray-700' }: any) => (
+  <div
+    onClick={onClick}
+    className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
+      onClick ? 'cursor-pointer' : ''
+    } hover:bg-gray-50`}
+  >
+    <div className={`p-2 rounded-lg ${bgIcon}`}>
+      <Icon size={18} className={iconColor} />
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className={`text-sm font-medium ${textColor}`}>
+        {label}
+      </div>
+      {description && (
+        <div className={`text-xs mt-0.5 ${descColor}`}>
+          {description}
+        </div>
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+const Toggle = ({ enabled, onChange, activeColor = 'bg-[#127749]', inactiveColor = 'bg-gray-300' }: any) => (
+  <button
+    onClick={() => onChange(!enabled)}
+    className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
+      enabled ? activeColor : inactiveColor
+    }`}
+  >
+    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${
+      enabled ? 'left-6' : 'left-1'
+    }`} />
+  </button>
+);
+
 const SettingsScreen = ({ user }: any) => {
   const { t, language, setLanguage } = useLanguage();
   const { isMobile } = useIsMobile();
@@ -53,63 +111,6 @@ const SettingsScreen = ({ user }: any) => {
     }
   };
 
-  const SettingSection = ({ title, description, children }: any) => (
-    <div className={`rounded-xl border overflow-hidden ${'border-gray-300'}`} style={{
-      background:'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
-      boxShadow: `inset 0 -1px 0 ${'rgba(215,183,151,0.04)'}`}}>
-      <div className={`px-5 py-4 border-b ${'border-gray-200'}`}>
-        <h3 className={`text-base font-semibold font-['Montserrat'] ${'text-gray-900'}`}>
-          {title}
-        </h3>
-        {description && (
-          <p className={`text-xs mt-0.5 ${'text-gray-700'}`}>
-            {description}
-          </p>
-        )}
-      </div>
-      <div className="p-2">
-        {children}
-      </div>
-    </div>
-  );
-
-  const SettingRow = ({ icon: Icon, label, description, children, onClick }: any) => (
-    <div
-      onClick={onClick}
-      className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
-        onClick ? 'cursor-pointer' : ''
-      } ${'hover:bg-gray-50'}`}
-    >
-      <div className={`p-2 rounded-lg ${'bg-gray-100'}`}>
-        <Icon size={18} className={'text-[#6B4D30]'} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className={`text-sm font-medium ${'text-gray-900'}`}>
-          {label}
-        </div>
-        {description && (
-          <div className={`text-xs mt-0.5 ${'text-gray-700'}`}>
-            {description}
-          </div>
-        )}
-      </div>
-      {children}
-    </div>
-  );
-
-  const Toggle = ({ enabled, onChange }: any) => (
-    <button
-      onClick={() => onChange(!enabled)}
-      className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
-        enabled
-          ? 'bg-[#127749]'
-          :'bg-gray-300'}`}
-    >
-      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${
-        enabled ? 'left-6' : 'left-1'
-      }`} />
-    </button>
-  );
   return (
     <div className="space-y-3 md:space-y-6">
       {/* Page Header */}

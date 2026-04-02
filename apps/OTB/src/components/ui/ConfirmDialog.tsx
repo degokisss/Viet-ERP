@@ -34,7 +34,11 @@ export default function ConfirmDialog({
   const canConfirm = !promptRequired || inputValue === promptRequired;
 
   useEffect(() => {
-    if (!open) { setInputValue(''); return; }
+    if (!open) {
+      // Defer state update to avoid cascading renders
+      const id = requestAnimationFrame(() => setInputValue(''));
+      return () => cancelAnimationFrame(id);
+    }
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCancel();
     };

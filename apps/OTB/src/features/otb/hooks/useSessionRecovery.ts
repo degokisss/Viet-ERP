@@ -152,10 +152,10 @@ export function useSessionRecovery(budgetId: string | null) {
   // Check for existing draft on mount / budgetId change
   useEffect(() => {
     if (!storageKey) {
-      setRecovery({ hasDraft: false, draftInfo: null });
+      requestAnimationFrame(() => setRecovery({ hasDraft: false, draftInfo: null }));
       return;
     }
-    setDismissed(false);
+    requestAnimationFrame(() => setDismissed(false));
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {

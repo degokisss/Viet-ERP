@@ -6,7 +6,8 @@ export function useNetworkStatus() {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
-    setIsOnline(navigator.onLine);
+    // Initialize with current network status via requestAnimationFrame to avoid cascading renders
+    requestAnimationFrame(() => setIsOnline(navigator.onLine));
 
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);

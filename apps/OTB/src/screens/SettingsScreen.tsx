@@ -11,6 +11,115 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { ConfirmDialog } from '@/components/ui';
 
+// Sub-components defined outside to avoid creating components during render
+const SettingSection = ({ title, description, children, darkMode }: any) => (
+  <div className={`rounded-xl border overflow-hidden ${
+    darkMode ? 'border-[#2E2E2E]' : 'border-gray-300'
+  }`} style={{
+    background: darkMode
+      ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.08) 100%)'
+      : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
+    boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.04)'}`,
+  }}>
+    <div className={`px-5 py-4 border-b ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'}`}>
+      <h3 className={`text-base font-semibold font-['Montserrat'] ${
+        darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
+      }`}>
+        {title}
+      </h3>
+      {description && (
+        <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+          {description}
+        </p>
+      )}
+    </div>
+    <div className="p-2">
+      {children}
+    </div>
+  </div>
+);
+
+const SettingRow = ({ icon: Icon, label, description, children, onClick, darkMode }: any) => (
+  <div
+    onClick={onClick}
+    className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
+      onClick ? 'cursor-pointer' : ''
+    } ${
+      darkMode
+        ? 'hover:bg-[rgba(215,183,151,0.05)]'
+        : 'hover:bg-gray-50'
+    }`}
+  >
+    <div className={`p-2 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
+      <Icon size={18} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
+        {label}
+      </div>
+      {description && (
+        <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+          {description}
+        </div>
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+const Toggle = ({ enabled, onChange, darkMode }: any) => (
+  <button
+    onClick={() => onChange(!enabled)}
+    className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
+      enabled
+        ? 'bg-[#127749]'
+        : darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-300'
+    }`}
+  >
+    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${
+      enabled ? 'left-6' : 'left-1'
+    }`} />
+  </button>
+);
+
+const ThemeOption = ({ value, icon: Icon, label, current, darkMode, updateSetting }: any) => {
+  const isSelected = current === value;
+  return (
+    <button
+      onClick={() => updateSetting(null, 'theme', value)}
+      className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all relative ${
+        isSelected
+          ? darkMode
+            ? 'border-[#D7B797] bg-[rgba(215,183,151,0.1)]'
+            : 'border-[#8A6340] bg-[rgba(215,183,151,0.15)]'
+          : darkMode
+            ? 'border-[#2E2E2E] hover:border-[#3E3E3E]'
+            : 'border-gray-300 hover:border-gray-400'
+      }`}
+    >
+      <Icon size={24} className={
+        isSelected
+          ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
+          : darkMode ? 'text-[#666666]' : 'text-gray-600'
+      } />
+      <span className={`text-sm font-medium ${
+        isSelected
+          ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
+          : darkMode ? 'text-[#999999]' : 'text-gray-600'
+      }`}>
+        {label}
+      </span>
+      {isSelected && (
+        <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${
+          darkMode ? 'bg-[#D7B797]' : 'bg-[#8A6340]'
+        }`}>
+          <Check size={12} className="text-white" />
+        </div>
+      )}
+    </button>
+  );
+};
+
 const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
   const { t, language, setLanguage } = useLanguage();
   const { isMobile } = useIsMobile();
@@ -60,111 +169,6 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
     }
   };
 
-  const SettingSection = ({ title, description, children }: any) => (
-    <div className={`rounded-xl border overflow-hidden ${
-      darkMode ? 'border-[#2E2E2E]' : 'border-gray-300'
-    }`} style={{
-      background: darkMode
-        ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.08) 100%)'
-        : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
-      boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.04)'}`,
-    }}>
-      <div className={`px-5 py-4 border-b ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'}`}>
-        <h3 className={`text-base font-semibold font-['Montserrat'] ${
-          darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-        }`}>
-          {title}
-        </h3>
-        {description && (
-          <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-            {description}
-          </p>
-        )}
-      </div>
-      <div className="p-2">
-        {children}
-      </div>
-    </div>
-  );
-
-  const SettingRow = ({ icon: Icon, label, description, children, onClick }: any) => (
-    <div
-      onClick={onClick}
-      className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
-        onClick ? 'cursor-pointer' : ''
-      } ${
-        darkMode
-          ? 'hover:bg-[rgba(215,183,151,0.05)]'
-          : 'hover:bg-gray-50'
-      }`}
-    >
-      <div className={`p-2 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
-        <Icon size={18} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
-          {label}
-        </div>
-        {description && (
-          <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-            {description}
-          </div>
-        )}
-      </div>
-      {children}
-    </div>
-  );
-
-  const Toggle = ({ enabled, onChange }: any) => (
-    <button
-      onClick={() => onChange(!enabled)}
-      className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
-        enabled
-          ? 'bg-[#127749]'
-          : darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-300'
-      }`}
-    >
-      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${
-        enabled ? 'left-6' : 'left-1'
-      }`} />
-    </button>
-  );
-
-  const ThemeOption = ({ value, icon: Icon, label, current }: any) => (
-    <button
-      onClick={() => updateSetting(null, 'theme', value)}
-      className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-        current === value
-          ? darkMode
-            ? 'border-[#D7B797] bg-[rgba(215,183,151,0.1)]'
-            : 'border-[#8A6340] bg-[rgba(215,183,151,0.15)]'
-          : darkMode
-            ? 'border-[#2E2E2E] hover:border-[#3E3E3E]'
-            : 'border-gray-300 hover:border-gray-400'
-      }`}
-    >
-      <Icon size={24} className={
-        current === value
-          ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
-          : darkMode ? 'text-[#666666]' : 'text-gray-600'
-      } />
-      <span className={`text-sm font-medium ${
-        current === value
-          ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
-          : darkMode ? 'text-[#999999]' : 'text-gray-600'
-      }`}>
-        {label}
-      </span>
-      {current === value && (
-        <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${
-          darkMode ? 'bg-[#D7B797]' : 'bg-[#8A6340]'
-        }`}>
-          <Check size={12} className="text-white" />
-        </div>
-      )}
-    </button>
-  );
-
   return (
     <div className="space-y-3 md:space-y-6">
       {/* Page Header */}
@@ -180,7 +184,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
       </div>
 
       {/* Appearance */}
-      <SettingSection title={t('settings.appearance')} description={t('settings.customizeAppLooks')}>
+      <SettingSection title={t('settings.appearance')} description={t('settings.customizeAppLooks')} darkMode={darkMode}>
         <div className="p-3">
           <div className={`text-xs font-medium uppercase tracking-wider mb-3 ${
             darkMode ? 'text-[#666666]' : 'text-gray-700'
@@ -188,9 +192,9 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
             {t('settings.theme')}
           </div>
           <div className="flex gap-3">
-            <ThemeOption value="light" icon={Sun} label={t('settings.light')} current={settings.theme} />
-            <ThemeOption value="dark" icon={Moon} label={t('settings.dark')} current={settings.theme} />
-            <ThemeOption value="system" icon={Monitor} label={t('settings.system')} current={settings.theme} />
+            <ThemeOption value="light" icon={Sun} label={t('settings.light')} current={settings.theme} darkMode={darkMode} updateSetting={updateSetting} />
+            <ThemeOption value="dark" icon={Moon} label={t('settings.dark')} current={settings.theme} darkMode={darkMode} updateSetting={updateSetting} />
+            <ThemeOption value="system" icon={Monitor} label={t('settings.system')} current={settings.theme} darkMode={darkMode} updateSetting={updateSetting} />
           </div>
         </div>
 
@@ -200,10 +204,12 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
           icon={Zap}
           label={t('settings.animations')}
           description={t('settings.animationsDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.display.animationsEnabled}
             onChange={(v: any) => updateSetting('display', 'animationsEnabled', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
 
@@ -211,20 +217,23 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
           icon={Type}
           label={t('settings.compactMode')}
           description={t('settings.compactModeDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.display.compactMode}
             onChange={(v: any) => updateSetting('display', 'compactMode', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
       </SettingSection>
 
       {/* Language & Region */}
-      <SettingSection title={t('settings.languageAndRegion')}>
+      <SettingSection title={t('settings.languageAndRegion')} darkMode={darkMode}>
         <SettingRow
           icon={Globe}
           label={t('settings.language')}
           description={t('settings.chooseLanguage')}
+          darkMode={darkMode}
         >
           <select
             value={language}
@@ -242,15 +251,17 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
       </SettingSection>
 
       {/* Notifications */}
-      <SettingSection title={t('settings.notifications')} description={t('settings.manageUpdates')}>
+      <SettingSection title={t('settings.notifications')} description={t('settings.manageUpdates')} darkMode={darkMode}>
         <SettingRow
           icon={Bell}
           label={t('settings.emailNotifications')}
           description={t('settings.emailNotificationsDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.notifications.email}
             onChange={(v: any) => updateSetting('notifications', 'email', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
 
@@ -258,10 +269,12 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
           icon={Bell}
           label={t('settings.pushNotifications')}
           description={t('settings.pushNotificationsDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.notifications.push}
             onChange={(v: any) => updateSetting('notifications', 'push', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
 
@@ -269,24 +282,28 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
           icon={BellOff}
           label={t('settings.desktopNotifications')}
           description={t('settings.desktopNotificationsDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.notifications.desktop}
             onChange={(v: any) => updateSetting('notifications', 'desktop', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
       </SettingSection>
 
       {/* Privacy */}
-      <SettingSection title={t('settings.privacy')} description={t('settings.controlVisibility')}>
+      <SettingSection title={t('settings.privacy')} description={t('settings.controlVisibility')} darkMode={darkMode}>
         <SettingRow
           icon={Eye}
           label={t('settings.showOnlineStatus')}
           description={t('settings.showOnlineStatusDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.privacy.showOnline}
             onChange={(v: any) => updateSetting('privacy', 'showOnline', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
 
@@ -294,21 +311,24 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
           icon={EyeOff}
           label={t('settings.showActivity')}
           description={t('settings.showActivityDesc')}
+          darkMode={darkMode}
         >
           <Toggle
             enabled={settings.privacy.showActivity}
             onChange={(v: any) => updateSetting('privacy', 'showActivity', v)}
+            darkMode={darkMode}
           />
         </SettingRow>
       </SettingSection>
 
       {/* Data & Storage */}
-      <SettingSection title={t('settings.dataAndStorage')}>
+      <SettingSection title={t('settings.dataAndStorage')} darkMode={darkMode}>
         <SettingRow
           icon={Download}
           label={t('settings.exportData')}
           description={t('settings.exportDataDesc')}
           onClick={() => alert(t('settings.exportComingSoon'))}
+          darkMode={darkMode}
         >
           <ChevronRight size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
         </SettingRow>
@@ -318,13 +338,14 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
           label={t('settings.clearCache')}
           description={t('settings.clearCacheDesc')}
           onClick={() => alert(t('settings.cacheCleared'))}
+          darkMode={darkMode}
         >
           <ChevronRight size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
         </SettingRow>
       </SettingSection>
 
       {/* Danger Zone */}
-      <SettingSection title={t('settings.dangerZone')}>
+      <SettingSection title={t('settings.dangerZone')} darkMode={darkMode}>
         <SettingRow
           icon={Trash2}
           label={t('settings.deleteAccount')}
@@ -338,6 +359,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }: any) => {
               onConfirm: () => { /* account deletion placeholder */ },
             });
           }}
+          darkMode={darkMode}
         >
           <span className={`text-xs font-medium px-2 py-1 rounded ${
             darkMode
