@@ -122,6 +122,52 @@
 
 ---
 
+## Phase 4: Completed Modules
+
+### Task 8: ✅ `backend-java/module-crm/` — CRM Domain Module
+
+- Company + Contact entities, repositories, services, REST controllers
+- DTOs at `domain/dto/` with `@Builder`
+- 10 unit tests (5 CompanyService + 5 ContactService)
+- Commits: `b3724fd`, `c586325`
+
+### Task 9: ✅ `backend-java/module-accounting/` — Accounting Domain Module
+
+- Account entity with VAS/TT200/TT133 compliance enums
+- AccountService with full CRUD
+- DTOs at `domain/dto/` with `@Builder`
+- 5 unit tests
+- Commits: `fdaf253`
+
+### Task 10: ✅ `backend-java/module-mrp/` — MRP Domain Module
+
+- Part + BomHeader entities, services, REST controllers
+- MRP enums (MakeOrBuy, LifecycleStatus, BomType)
+- DTOs at `domain/dto/` with `@Builder`
+- 10 unit tests
+- Commit: `9044cf9`
+
+### Task 11: ✅ `backend-java/module-tpm/` — TPM Domain Module
+
+- Promotion + Claim entities, services, REST controllers
+- TPM enums (PromotionStatus, ClaimStatus)
+- DTOs at `domain/dto/` with `@Builder`
+- 10 unit tests
+- Commit: `40a27d4`
+
+### Structural Refactor: ✅ DTOs moved to `domain/dto/`
+
+- All DTOs moved from `service/dto/` to `domain/dto/` per layered architecture
+- 9 DTOs moved across 3 modules (hrm, crm, accounting)
+- 25 tests pass after refactor
+- Commit: `0309d54`
+
+### NestJS Cleanup
+
+Per-module NestJS removal is **pending** — will proceed after Phase 5 (integration tests validate the modules).
+
+---
+
 ## Phase 5: Infrastructure Integration
 
 ### Task: Keycloak Integration Test
