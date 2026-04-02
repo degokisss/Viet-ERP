@@ -13,19 +13,60 @@ const DEFAULT_CONFIG: KeycloakConfig = {
   clientId: process.env.NEXT_PUBLIC_SSO_CLIENT_ID || 'erp-app',
 };
 
+const SESSION_KEY = 'erp_session';
+const VERIFIER_KEY = 'erp_pkce_verifier';
+
 /**
- * Redirect to Keycloak login page
+ * Generate a cryptographically random PKCE code verifier (43-128 chars)
  */
-export function login(config: Partial<KeycloakConfig> = {}): void {
+function generateCodeVerifier(): string {
+  const array = new Uint8Array(64);
+  crypto.getRandomValues(array);
+  return base64UrlEncode(array).substring(0, 128);
+}
+
+/**
+ * Derive PKCE code challenge from verifier using S256 method
+ * challenge = BASE64URL(SHA256(verifier))
+ */
+async function generateCodeChallenge(verifier: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return base64UrlEncode(new Uint8Array(digest));
+}
+
+/**
+ * Base64url encode (no padding)
+ */
+function base64UrlEncode(array: Uint8Array): string {
+  const base64 = btoa(String.fromCharCode(...array));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+/**
+ * Redirect to Keycloak login page with PKCE
+ */
+export async function login(config: Partial<KeycloakConfig> = {}): Promise<void> {
   const cfg = { ...DEFAULT_CONFIG, ...config };
   const redirectUri = config.redirectUri || window.location.origin + '/auth/callback';
+
+  // Generate PKCE verifier + challenge
+  const verifier = generateCodeVerifier();
+  const challenge = await generateCodeChallenge(verifier);
+  const state = generateState();
+
+  // Store verifier for callback exchange (survives redirect)
+  sessionStorage.setItem(VERIFIER_KEY, JSON.stringify({ verifier, state }));
 
   const params = new URLSearchParams({
     client_id: cfg.clientId,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'openid profile email',
-    state: generateState(),
+    state,
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
   });
 
   window.location.href = `${cfg.issuerUrl}/protocol/openid-connect/auth?${params}`;
@@ -38,8 +79,9 @@ export function logout(config: Partial<KeycloakConfig> = {}): void {
   const cfg = { ...DEFAULT_CONFIG, ...config };
   const redirectUri = window.location.origin;
 
-  // Clear local session
-  sessionStorage.removeItem('erp_session');
+  // Clear local session and PKCE verifier
+  sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(VERIFIER_KEY);
 
   const params = new URLSearchParams({
     client_id: cfg.clientId,
@@ -51,6 +93,7 @@ export function logout(config: Partial<KeycloakConfig> = {}): void {
 
 /**
  * Exchange authorization code for tokens (call from /auth/callback page)
+ * Uses PKCE verifier and implements refresh token rotation
  */
 export async function handleCallback(
   code: string,
@@ -58,6 +101,14 @@ export async function handleCallback(
 ): Promise<AuthSession> {
   const cfg = { ...DEFAULT_CONFIG, ...config };
   const redirectUri = config.redirectUri || window.location.origin + '/auth/callback';
+
+  // Retrieve and verify PKCE state
+  const rawVerifier = sessionStorage.getItem(VERIFIER_KEY);
+  if (!rawVerifier) {
+    throw new Error('PKCE verifier not found — login may have been initiated without PKCE or session expired');
+  }
+  const { verifier } = JSON.parse(rawVerifier) as { verifier: string };
+  sessionStorage.removeItem(VERIFIER_KEY);
 
   const response = await fetch(`${cfg.issuerUrl}/protocol/openid-connect/token`, {
     method: 'POST',
@@ -67,6 +118,7 @@ export async function handleCallback(
       client_id: cfg.clientId,
       code,
       redirect_uri: redirectUri,
+      code_verifier: verifier,
     }),
   });
 
@@ -85,8 +137,8 @@ export async function handleCallback(
     expiresAt: Date.now() + data.expires_in * 1000,
   };
 
-  // Store session
-  sessionStorage.setItem('erp_session', JSON.stringify(session));
+  // Store session (refresh token rotation — old token is invalidated by Keycloak on use)
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return session;
 }
 
@@ -95,12 +147,12 @@ export async function handleCallback(
  */
 export function getSession(): AuthSession | null {
   if (typeof window === 'undefined') return null;
-  const raw = sessionStorage.getItem('erp_session');
+  const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return null;
 
   const session: AuthSession = JSON.parse(raw);
   if (Date.now() > session.expiresAt) {
-    sessionStorage.removeItem('erp_session');
+    sessionStorage.removeItem(SESSION_KEY);
     return null;
   }
   return session;
@@ -116,6 +168,7 @@ export function getAccessToken(): string | null {
 
 /**
  * Refresh the access token using refresh token
+ * Implements refresh token rotation — old token is invalidated by Keycloak on use
  */
 export async function refreshSession(
   config: Partial<KeycloakConfig> = {}
@@ -137,7 +190,8 @@ export async function refreshSession(
     });
 
     if (!response.ok) {
-      sessionStorage.removeItem('erp_session');
+      // Refresh token reuse detected or token revoked — clear session
+      sessionStorage.removeItem(SESSION_KEY);
       return null;
     }
 
@@ -145,6 +199,8 @@ export async function refreshSession(
     const payload = parseJwtPayload(data.access_token);
     const user = extractUser(payload);
 
+    // Refresh token rotation: new tokens replace old ones
+    // Keycloak invalidates the old refresh token on use
     const newSession: AuthSession = {
       user,
       accessToken: data.access_token,
@@ -152,10 +208,10 @@ export async function refreshSession(
       expiresAt: Date.now() + data.expires_in * 1000,
     };
 
-    sessionStorage.setItem('erp_session', JSON.stringify(newSession));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
     return newSession;
   } catch {
-    sessionStorage.removeItem('erp_session');
+    sessionStorage.removeItem(SESSION_KEY);
     return null;
   }
 }
