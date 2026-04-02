@@ -1,7 +1,7 @@
 package com.vieterp.crm.controller;
 
-import com.vieterp.crm.service.dto.ContactResponse;
-import com.vieterp.crm.service.dto.CreateContactRequest;
+import com.vieterp.crm.domain.dto.ContactResponse;
+import com.vieterp.crm.domain.dto.CreateContactRequest;
 import com.vieterp.crm.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,4 +1,4 @@
-package com.vieterp.hrm.service.dto;
+package com.vieterp.hrm.domain.dto;
 
 import java.time.Instant;
 import java.util.UUID;

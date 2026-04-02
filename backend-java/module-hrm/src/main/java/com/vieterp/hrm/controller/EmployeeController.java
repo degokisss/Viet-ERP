@@ -1,7 +1,7 @@
 package com.vieterp.hrm.controller;
 
-import com.vieterp.hrm.service.dto.CreateEmployeeRequest;
-import com.vieterp.hrm.service.dto.EmployeeResponse;
+import com.vieterp.hrm.domain.dto.CreateEmployeeRequest;
+import com.vieterp.hrm.domain.dto.EmployeeResponse;
 import com.vieterp.hrm.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

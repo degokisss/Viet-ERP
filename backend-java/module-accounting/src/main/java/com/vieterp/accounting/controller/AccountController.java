@@ -1,7 +1,7 @@
 package com.vieterp.accounting.controller;
 
-import com.vieterp.accounting.service.dto.AccountResponse;
-import com.vieterp.accounting.service.dto.CreateAccountRequest;
+import com.vieterp.accounting.domain.dto.AccountResponse;
+import com.vieterp.accounting.domain.dto.CreateAccountRequest;
 import com.vieterp.accounting.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,7 +1,7 @@
 package com.vieterp.crm.controller;
 
-import com.vieterp.crm.service.dto.CompanyResponse;
-import com.vieterp.crm.service.dto.CreateCompanyRequest;
+import com.vieterp.crm.domain.dto.CompanyResponse;
+import com.vieterp.crm.domain.dto.CreateCompanyRequest;
 import com.vieterp.crm.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

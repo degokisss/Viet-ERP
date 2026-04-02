@@ -1,4 +1,4 @@
-package com.vieterp.accounting.service.dto;
+package com.vieterp.accounting.domain.dto;
 
 import com.vieterp.accounting.domain.enums.AccountGroup;
 import com.vieterp.accounting.domain.enums.AccountType;
