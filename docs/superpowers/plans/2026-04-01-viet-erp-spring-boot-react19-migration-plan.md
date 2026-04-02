@@ -181,11 +181,32 @@ Per-module NestJS removal is **pending** — will proceed after Phase 5 (integra
 - Start NATS locally or point to existing cluster
 - POST to create employee → verify `hrm.employee.created` message on NATS
 
-### Task: Kong Gateway Cutover
+### Task: Kong Gateway Cutover ✅ DONE
 
-- Add Spring Boot upstream to Kong config
-- Update route targets: NestJS service → Spring Boot service
-- `kubectl apply` Kong changes
+- Kong routes updated from NestJS ports (3001-3008) to Spring Boot ports (8080-8084):
+  - `hrm-service`: 3002 → 8080
+  - `crm-service`: 3003 → 8081
+  - `acc-service`: 3007 → 8082
+  - `mrp-service`: 3001 → 8083
+  - `tpm-service`: 3004 → 8084
+- `infrastructure/kong/kong.yml` updated
+- Commit: `f81882d`
+
+### Task: module-shared ✅ DONE
+
+- `backend-java/module-shared/` created with `BaseEntity.java` (common audit fields: createdAt, updatedAt, tenantId, @PrePersist/@PreUpdate)
+- Commit: `f81882d`
+
+### Task: Keycloak Integration Test
+
+- Deploy Spring Boot with test Keycloak realm
+- Call `/api/v1/hrm/employees` with valid JWT → 200
+- Call without JWT → 401
+
+### Task: NATS Integration Test
+
+- Start NATS locally or point to existing cluster
+- POST to create employee → verify `hrm.employee.created` message on NATS
 
 ---
 
