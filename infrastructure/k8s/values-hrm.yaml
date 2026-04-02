@@ -1,0 +1,33 @@
+# VietERP HRM Module - Spring Boot Helm Values
+image:
+  repository: vieterp/backend-hrm
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 8080
+
+env:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vieterp
+  SPRING_DATASOURCE_USERNAME: postgres
+  SPRING_DATASOURCE_PASSWORD: postgres
+  KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/vieterp
+  NATS_URL: nats://nats:4222
+  REDIS_URL: redis://redis:6379
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
