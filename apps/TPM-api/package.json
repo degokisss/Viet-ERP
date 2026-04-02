@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "echo 'Starting Vercel manually is required to prevent recursion bug.'",
+    "dev:api": "vercel dev",
     "build": "tsc",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

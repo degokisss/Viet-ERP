@@ -28,9 +28,9 @@
     "@vierp/feature-flags": "*",
     "@vierp/master-data": "*",
     "@prisma/client": "^5.14.0",
-    "next": "^14.2.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
     "zod": "^3.23.0",
     "decimal.js": "^10.4.3",
     "date-fns": "^3.6.0"
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/node": "^20.12.0",
-    "@types/react": "^18.3.0",
+    "@types/react": "latest",
     "typescript": "^5.4.0",
     "prisma": "^5.14.0",
     "vitest": "^1.6.0"
