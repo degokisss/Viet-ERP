@@ -340,6 +340,13 @@ model Tenant {
   internalApplications InternalApplication[]
   careerProfiles       CareerProfile[]
 
+  KPIScore           KPIScore[]
+  DisciplinaryRecord DisciplinaryRecord[]
+  SalaryAdvance      SalaryAdvance[]
+  ImportSession      ImportSession[]
+  SystemSetting      SystemSetting[]
+  KPIPeriod          KPIPeriod[]
+
   @@map("tenants")
 }
 
@@ -443,6 +450,11 @@ model User {
 
   // Phase 7: Custom Roles
   customRoles UserCustomRole[]
+
+  KPIPeriodsCreated      KPIPeriod[]     @relation("KPICreator")
+  KPIScoresEntered       KPIScore[]      @relation("KPIEnterer")
+  salaryAdvancesApproved SalaryAdvance[] @relation("AdvanceApprover")
+  importSessions         ImportSession[] @relation("ImportUser")
 
   @@unique([tenantId, email])
   @@map("users")
@@ -704,10 +716,13 @@ model Employee {
   erasureRequests ErasureRequest[]
 
   // Phase 8: Internal Marketplace
-  jobPostingsCreated         InternalJobPosting[]    @relation("PostingCreator")
-  jobPostingsAsHiringManager InternalJobPosting[]    @relation("PostingHiringManager")
+  jobPostingsCreated         InternalJobPosting[]  @relation("PostingCreator")
+  jobPostingsAsHiringManager InternalJobPosting[]  @relation("PostingHiringManager")
   internalApplications       InternalApplication[]
   careerProfile              CareerProfile?
+  KPIScore                   KPIScore[]
+  DisciplinaryRecord         DisciplinaryRecord[]
+  SalaryAdvance              SalaryAdvance[]
 
   @@unique([tenantId, employeeCode])
   @@index([tenantId, status])
@@ -6750,8 +6765,8 @@ model AlertTriggerHistory {
 
 enum ApprovalMode {
   SEQUENTIAL // Duyệt tuần tự (mặc định hiện tại)
-  PARALLEL   // Duyệt song song (tất cả cùng lúc)
-  QUORUM     // Duyệt đa số (N/M người duyệt)
+  PARALLEL // Duyệt song song (tất cả cùng lúc)
+  QUORUM // Duyệt đa số (N/M người duyệt)
 }
 
 model CustomRole {
@@ -6773,10 +6788,10 @@ model CustomRole {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  tenant      Tenant             @relation(fields: [tenantId], references: [id])
-  permissions RolePermission[]
+  tenant           Tenant            @relation(fields: [tenantId], references: [id])
+  permissions      RolePermission[]
   fieldPermissions FieldPermission[]
-  users       UserCustomRole[]
+  users            UserCustomRole[]
 
   @@unique([tenantId, code])
   @@map("custom_roles")
@@ -6844,12 +6859,12 @@ model FieldPermission {
 // ═══════════════════════════════════════════════════════════════
 
 enum ErasureStatus {
-  REQUESTED   // Yêu cầu mới
-  REVIEWING   // Đang xem xét
-  APPROVED    // Đã duyệt
-  PROCESSING  // Đang xử lý xóa
-  COMPLETED   // Đã xóa xong
-  REJECTED    // Từ chối
+  REQUESTED // Yêu cầu mới
+  REVIEWING // Đang xem xét
+  APPROVED // Đã duyệt
+  PROCESSING // Đang xử lý xóa
+  COMPLETED // Đã xóa xong
+  REJECTED // Từ chối
 }
 
 model ErasureRequest {
@@ -6857,7 +6872,7 @@ model ErasureRequest {
   tenantId String @map("tenant_id")
 
   // Subject of erasure
-  employeeId String @map("employee_id")
+  employeeId  String @map("employee_id")
   requestedBy String @map("requested_by") // User ID
 
   // Request details
@@ -6904,7 +6919,7 @@ model RetentionPolicy {
   tenantId String @map("tenant_id")
 
   name        String // "Chính sách lưu trữ bảng lương"
-  entityType  String @map("entity_type") // "payroll", "attendance", "audit_log", etc.
+  entityType  String  @map("entity_type") // "payroll", "attendance", "audit_log", etc.
   description String?
 
   // Retention period
@@ -6922,8 +6937,8 @@ model RetentionPolicy {
   isActive Boolean @default(true) @map("is_active")
 
   // Last execution
-  lastRunAt     DateTime? @map("last_run_at")
-  lastRunCount  Int?      @map("last_run_count")
+  lastRunAt    DateTime? @map("last_run_at")
+  lastRunCount Int?      @map("last_run_count")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -6982,11 +6997,11 @@ model InternalJobPosting {
   title       String @db.VarChar(200)
   description String @db.Text
 
-  jobType    InternalJobType        @map("job_type")
-  visibility MarketplaceVisibility  @default(ALL)
+  jobType    InternalJobType          @map("job_type")
+  visibility MarketplaceVisibility    @default(ALL)
   status     MarketplacePostingStatus @default(DRAFT)
 
-  departmentId String @map("department_id")
+  departmentId String  @map("department_id")
   positionId   String? @map("position_id")
 
   requirements    Json?    @default("[]")
@@ -7010,12 +7025,12 @@ model InternalJobPosting {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  tenant         Tenant       @relation(fields: [tenantId], references: [id])
-  department     Department   @relation(fields: [departmentId], references: [id])
-  position       Position?    @relation(fields: [positionId], references: [id])
-  hiringManager  Employee     @relation("PostingHiringManager", fields: [hiringManagerId], references: [id])
-  createdBy      Employee     @relation("PostingCreator", fields: [createdById], references: [id])
-  applications   InternalApplication[]
+  tenant        Tenant                @relation(fields: [tenantId], references: [id])
+  department    Department            @relation(fields: [departmentId], references: [id])
+  position      Position?             @relation(fields: [positionId], references: [id])
+  hiringManager Employee              @relation("PostingHiringManager", fields: [hiringManagerId], references: [id])
+  createdBy     Employee              @relation("PostingCreator", fields: [createdById], references: [id])
+  applications  InternalApplication[]
 
   @@index([tenantId, status])
   @@index([tenantId, departmentId])
@@ -7024,9 +7039,9 @@ model InternalJobPosting {
 }
 
 model InternalApplication {
-  id        String @id @default(cuid())
-  tenantId  String @map("tenant_id")
-  postingId String @map("posting_id")
+  id          String @id @default(cuid())
+  tenantId    String @map("tenant_id")
+  postingId   String @map("posting_id")
   applicantId String @map("applicant_id")
 
   status InternalApplicationStatus @default(SUBMITTED)
@@ -7038,7 +7053,7 @@ model InternalApplication {
   managerApprovalAt DateTime? @map("manager_approval_at")
   managerNotes      String?   @map("manager_notes") @db.Text
 
-  interviewNotes String? @map("interview_notes") @db.Text
+  interviewNotes  String? @map("interview_notes") @db.Text
   rejectionReason String? @map("rejection_reason") @db.Text
 
   withdrawnAt     DateTime? @map("withdrawn_at")
@@ -7047,9 +7062,9 @@ model InternalApplication {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  tenant    Tenant              @relation(fields: [tenantId], references: [id])
-  posting   InternalJobPosting  @relation(fields: [postingId], references: [id], onDelete: Cascade)
-  applicant Employee            @relation(fields: [applicantId], references: [id])
+  tenant    Tenant             @relation(fields: [tenantId], references: [id])
+  posting   InternalJobPosting @relation(fields: [postingId], references: [id], onDelete: Cascade)
+  applicant Employee           @relation(fields: [applicantId], references: [id])
 
   @@unique([postingId, applicantId])
   @@index([tenantId, applicantId])
@@ -7062,14 +7077,14 @@ model CareerProfile {
   tenantId   String @map("tenant_id")
   employeeId String @unique @map("employee_id")
 
-  headline     String? @db.VarChar(200)
-  summary      String? @db.Text
-  skills       String[]
-  interests    String[]
-  careerGoals  String? @map("career_goals") @db.Text
+  headline    String?  @db.VarChar(200)
+  summary     String?  @db.Text
+  skills      String[]
+  interests   String[]
+  careerGoals String?  @map("career_goals") @db.Text
 
-  openToOpportunities Boolean @default(true) @map("open_to_opportunities")
-  preferredJobTypes   String[] @map("preferred_job_types")
+  openToOpportunities  Boolean  @default(true) @map("open_to_opportunities")
+  preferredJobTypes    String[] @map("preferred_job_types")
   preferredDepartments String[] @map("preferred_departments")
 
   bookmarkedPostings String[] @map("bookmarked_postings")
@@ -7120,16 +7135,16 @@ model KPIPeriod {
 }
 
 model KPIScore {
-  id          String   @id @default(cuid())
-  tenantId    String   @map("tenant_id")
-  periodId    String   @map("period_id")
-  employeeId  String   @map("employee_id")
-  score       Decimal  @db.Decimal(5, 2)
-  kpiAmount   Decimal  @db.Decimal(15, 2)
-  notes       String?
-  enteredBy   String   @map("entered_by")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  tenantId   String   @map("tenant_id")
+  periodId   String   @map("period_id")
+  employeeId String   @map("employee_id")
+  score      Decimal  @db.Decimal(5, 2)
+  kpiAmount  Decimal  @db.Decimal(15, 2)
+  notes      String?
+  enteredBy  String   @map("entered_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id])
   period   KPIPeriod @relation(fields: [periodId], references: [id])
@@ -7204,7 +7219,7 @@ enum ImportType {
   POSITIONS
 }
 
-enum ImportStatus {
+enum ImportSessionStatus {
   DRY_RUN
   PREVIEWING
   EXECUTING
@@ -7214,24 +7229,24 @@ enum ImportStatus {
 }
 
 model ImportSession {
-  id            String       @id @default(cuid())
-  tenantId      String       @map("tenant_id")
-  type          ImportType
-  status        ImportStatus @default(DRY_RUN)
-  fileName      String       @map("file_name")
-  fileSize      Int          @map("file_size")
-  totalRows     Int          @map("total_rows")
-  successRows   Int          @default(0) @map("success_rows")
-  errorRows     Int          @default(0) @map("error_rows")
-  mapping       Json         @default("{}")
-  errors        Json         @default("[]")
-  importedIds   Json         @default("[]") @map("imported_ids")
-  rawData       Json?        @map("raw_data")
-  metadata      Json?        @default("{}")
-  importedBy    String       @map("imported_by")
-  completedAt   DateTime?    @map("completed_at")
-  rolledBackAt  DateTime?    @map("rolled_back_at")
-  createdAt     DateTime     @default(now()) @map("created_at")
+  id           String              @id @default(cuid())
+  tenantId     String              @map("tenant_id")
+  type         ImportType
+  status       ImportSessionStatus @default(DRY_RUN)
+  fileName     String              @map("file_name")
+  fileSize     Int                 @map("file_size")
+  totalRows    Int                 @map("total_rows")
+  successRows  Int                 @default(0) @map("success_rows")
+  errorRows    Int                 @default(0) @map("error_rows")
+  mapping      Json                @default("{}")
+  errors       Json                @default("[]")
+  importedIds  Json                @default("[]") @map("imported_ids")
+  rawData      Json?               @map("raw_data")
+  metadata     Json?               @default("{}")
+  importedBy   String              @map("imported_by")
+  completedAt  DateTime?           @map("completed_at")
+  rolledBackAt DateTime?           @map("rolled_back_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
 
   tenant   Tenant @relation(fields: [tenantId], references: [id])
   importer User   @relation("ImportUser", fields: [importedBy], references: [id])
