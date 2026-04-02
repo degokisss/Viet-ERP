@@ -46,7 +46,7 @@
         <!-- VietERP events (local Maven artifact) -->
         <dependency>
             <groupId>com.vieterp</groupId>
-            <artifactId>events</artifactId>
+            <artifactId>module-events</artifactId>
             <version>${project.version}</version>
         </dependency>
 
