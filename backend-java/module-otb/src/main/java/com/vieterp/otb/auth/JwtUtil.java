@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -37,6 +38,7 @@ public class JwtUtil {
     public String generateRefreshToken(Long userId) {
         return Jwts.builder()
                 .subject(String.valueOf(userId))
+                .claim("jti", UUID.randomUUID().toString())
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiryMs))
@@ -50,6 +52,7 @@ public class JwtUtil {
                 .claim("email", email)
                 .claim("name", name)
                 .claim("roles", roles)
+                .claim("jti", UUID.randomUUID().toString())
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiryMs))
