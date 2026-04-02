@@ -1,0 +1,4 @@
+com/vieterp/api/PagedResponse.class
+com/vieterp/api/PagedResponse$PagedResponseBuilder.class
+com/vieterp/api/ErrorResponse.class
+com/vieterp/api/ErrorResponse$ErrorResponseBuilder.class
