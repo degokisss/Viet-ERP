@@ -11,6 +11,7 @@ public enum Permission {
     HRM_EMPLOYEE_DELETE,
     HRM_DEPARTMENT_READ,
     HRM_DEPARTMENT_WRITE,
+    HRM_DEPARTMENT_DELETE,
     // CRM
     CRM_CONTACT_READ,
     CRM_CONTACT_WRITE,
@@ -24,6 +25,7 @@ public enum Permission {
     MRP_PLAN_WRITE,
     MRP_BOM_READ,
     MRP_BOM_WRITE,
+    MRP_BOM_DELETE,
     // TPM
     TPM_PROMOTION_READ,
     TPM_PROMOTION_WRITE,

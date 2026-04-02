@@ -23,13 +23,4 @@ public record ErrorResponse(
         }
     }
 
-    public static ErrorResponse of(String type, String title, int status, String detail) {
-        return ErrorResponse.builder()
-            .type(type)
-            .title(title)
-            .status(status)
-            .detail(detail)
-            .timestamp(Instant.now())
-            .build();
     }
-}

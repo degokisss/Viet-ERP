@@ -50,11 +50,4 @@ class PagedResponseTest {
         assertNotNull(err.timestamp());
     }
 
-    @Test
-    void errorResponseOfFactory() {
-        var err = ErrorResponse.of("type", "Title", 400, "detail");
-        assertEquals(400, err.status());
-        assertEquals("Title", err.title());
-        assertNotNull(err.timestamp());
     }
-}

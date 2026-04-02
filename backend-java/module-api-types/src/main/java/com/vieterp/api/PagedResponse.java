@@ -22,7 +22,7 @@ public record PagedResponse<T>(
             .page(page)
             .pageSize(pageSize)
             .total(total)
-            .hasNext((long) (page + 1) * pageSize < total)
+            .hasNext((long) page * pageSize + pageSize < total)
             .build();
     }
 }
