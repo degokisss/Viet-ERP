@@ -14,6 +14,9 @@
 
     <modules>
         <module>module-hrm</module>
+        <module>module-events</module>
+        <module>module-auth</module>
+        <module>module-api-types</module>
         <module>module-shared</module>
     </modules>
 
